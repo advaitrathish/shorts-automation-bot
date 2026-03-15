@@ -123,21 +123,32 @@ Rules:
 """
 
         headers = {
-    "Authorization": f"Bearer {GROQ_API_KEY}",
-    "Content-Type": "application/json"
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
         }
 
         payload = {
             "model": "llama3-70b-8192",
             "messages": [
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            "temperature": 0.9
         }
 
-        response = requests.post(GROQ_URL, headers=headers, json=payload)
-        data = response.json()
+        try:
 
-        script = data["choices"][0]["message"]["content"].strip()
+            response = requests.post(GROQ_URL, headers=headers, json=payload)
+            data = response.json()
+
+            if "choices" not in data:
+                print("Groq API error:", data)
+                continue
+
+            script = data["choices"][0]["message"]["content"].strip()
+
+        except Exception as e:
+            print("API request failed:", e)
+            continue
 
         # --- CLEANUP AI OUTPUT ---
         script = script.replace("Here's the story:", "")
@@ -149,7 +160,7 @@ Rules:
 
         if not script:
             print("Empty story generated, retrying...")
-            return generate_script()
+            continue
 
         # Avoid duplicate stories in one session
         if script not in generated_stories:
