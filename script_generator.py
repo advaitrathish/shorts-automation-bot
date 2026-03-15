@@ -1,7 +1,10 @@
 import requests
 import random
+import os
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
+# GROQ API
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Prevent duplicate stories during one run
 generated_stories = set()
@@ -119,17 +122,26 @@ Rules:
 - do not repeat common horror phrases
 """
 
-        payload = {
-            "model": "llama3",
-            "prompt": prompt,
-            "stream": False
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
         }
 
-        response = requests.post(OLLAMA_URL, json=payload)
+        payload = {
+            "model": "llama3-70b-8192",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        }
+
+        response = requests.post(GROQ_URL, headers=headers, json=payload)
 
         data = response.json()
 
-        script = data.get("response", "").strip()
+        script = data["choices"][0]["message"]["content"].strip()
 
         # --- CLEANUP AI OUTPUT ---
         script = script.replace("Here's the story:", "")

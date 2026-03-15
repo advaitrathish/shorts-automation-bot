@@ -2,15 +2,15 @@ import asyncio
 import random
 import edge_tts
 
-VOICE_FILE = "output/voice.mp3"
-
 voices = [
     "en-US-AriaNeural",     # best female narration
     "en-GB-RyanNeural",     # very natural male
 ]
 
 
-async def generate_voice_async(script):
+async def generate_voice_async(script, index):
+
+    VOICE_FILE = f"output/voice_{index}.mp3"
 
     voice = random.choice(voices)
 
@@ -34,9 +34,13 @@ async def generate_voice_async(script):
 
     await communicate.save(VOICE_FILE)
 
+    return VOICE_FILE
 
-def generate_voice(script):
 
-    asyncio.run(generate_voice_async(script))
+def generate_voice(script, index=0):
 
-    print("Voice generated:", VOICE_FILE)
+    voice_file = asyncio.run(generate_voice_async(script, index))
+
+    print("Voice generated:", voice_file)
+
+    return voice_file
