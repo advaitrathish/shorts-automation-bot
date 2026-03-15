@@ -5,10 +5,13 @@ from moviepy import (
     VideoFileClip,
     AudioFileClip,
     TextClip,
-    CompositeVideoClip
+    CompositeVideoClip,
+    CompositeAudioClip
 )
 
 GAMEPLAY_FOLDER = "gameplay"
+MUSIC_FOLDER = "music"
+
 VOICE_FILE = "output/voice.mp3"
 OUTPUT_FILE = "output/short.mp4"
 
@@ -24,30 +27,46 @@ def generate_subtitles(script, duration):
 
     word_duration = duration / len(words)
 
+    # words that should stand out
+    highlight_words = [
+        "RUN",
+        "DON'T",
+        "STOP",
+        "LOOK",
+        "BEHIND",
+        "WARNING",
+        "DANGER",
+        "HELP",
+        "NOW",
+        "CALL",
+        "ANSWER",
+        "WATCHING",
+        "INSIDE"
+    ]
+
     for i, word in enumerate(words):
 
-        # Highlight current word
-        txt = TextClip(
-            text=word.upper(),
-            font_size=120,
-            color="yellow",          # highlight color
-            stroke_color="black",
-            stroke_width=5,
-            method="caption",
-            size=(900, 320),
-            text_align="center"
-        )
+        word_clean = word.upper().strip(".,!?")
+
+        # highlight important words
+        if word_clean in highlight_words:
+            color = "red"
+        else:
+            color = "yellow"
 
         txt = TextClip(
             text=word.upper(),
             font_size=120,
-            color="yellow",
+            color=color,
             stroke_color="black",
             stroke_width=5,
             method="caption",
             size=(900, 320),
             text_align="center"
-        ).with_position(("center",1500)).with_start(i * word_duration).with_duration(word_duration).resized(lambda t: 1 + 0.1 * t)
+        ).with_position(("center",1500)) \
+         .with_start(i * word_duration) \
+         .with_duration(word_duration) \
+         .resized(lambda t: 1 + 0.1 * t)
 
         subtitles.append(txt)
 
@@ -55,11 +74,40 @@ def generate_subtitles(script, duration):
 
 
 # -----------------------------
+# Random Background Music
+# -----------------------------
+def get_background_music(duration):
+
+    if not os.path.exists(MUSIC_FOLDER):
+        return None
+
+    music_files = [f for f in os.listdir(MUSIC_FOLDER) if f.endswith(".mp3")]
+
+    if not music_files:
+        return None
+
+    music_path = os.path.join(MUSIC_FOLDER, random.choice(music_files))
+
+    music = AudioFileClip(music_path)
+
+    # loop or trim music to match narration
+    if music.duration < duration:
+        music = music.loop(duration=duration)
+    else:
+        music = music.subclipped(0, duration)
+
+    # reduce music volume so narration stays clear
+    music = music.with_volume_scaled(0.15)
+
+    return music
+
+
+# -----------------------------
 # Main Video Generator
 # -----------------------------
 def generate_video(script):
 
-    # load audio
+    # load narration
     audio = AudioFileClip(VOICE_FILE)
 
     narration_duration = audio.duration
@@ -102,13 +150,23 @@ def generate_video(script):
         height=1920
     )
 
-    # attach narration
-    clip = clip.with_audio(audio)
+    # -----------------------------
+    # Background Music
+    # -----------------------------
+    music = get_background_music(narration_duration)
 
-    # generate subtitles
+    if music:
+        final_audio = CompositeAudioClip([audio, music])
+    else:
+        final_audio = audio
+
+    clip = clip.with_audio(final_audio)
+
+    # -----------------------------
+    # Subtitles
+    # -----------------------------
     subtitles = generate_subtitles(script, narration_duration)
 
-    # combine video + subtitles
     final_clip = CompositeVideoClip(
         [clip, *subtitles],
         size=(1080, 1920)
