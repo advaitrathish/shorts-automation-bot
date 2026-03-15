@@ -5,12 +5,8 @@ import edge_tts
 VOICE_FILE = "output/voice.mp3"
 
 voices = [
-
-    "en-US-GuyNeural",
-    "en-US-AndrewNeural",
-
-    "en-US-JennyNeural",
-    "en-US-AriaNeural"
+    "en-US-AriaNeural",     # best female narration
+    "en-GB-RyanNeural",     # very natural male
 ]
 
 
@@ -20,12 +16,20 @@ async def generate_voice_async(script):
 
     print("Selected voice:", voice)
 
+    # Add SSML formatting
+    ssml_text = f"""
+<speak>
+<prosody rate="-5%" pitch="+2Hz">
+
+{script.replace('.', '.<break time="300ms"/>')}
+
+</prosody>
+</speak>
+"""
+
     communicate = edge_tts.Communicate(
-        text=script,
-        voice=voice,
-        rate="-5%",      # slightly slower for drama
-        pitch="+2Hz",    # FIXED (must be Hz)
-        volume="+0%"
+        text=ssml_text,
+        voice=voice
     )
 
     await communicate.save(VOICE_FILE)

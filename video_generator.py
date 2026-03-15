@@ -13,61 +13,82 @@ VOICE_FILE = "output/voice.mp3"
 OUTPUT_FILE = "output/short.mp4"
 
 
+# -----------------------------
+# Subtitle Generator
+# -----------------------------
 def generate_subtitles(script, duration):
+
     words = script.split()
-    chunks = []
-    
-    # Using 1-2 words for high-speed 'viral' pacing
-    temp = []
-    for word in words:
-        temp.append(word)
-        if len(temp) == 2: # Keep it at 1 or 2 words max
-            chunks.append(" ".join(temp))
-            temp = []
-    if temp:
-        chunks.append(" ".join(temp))
 
     subtitles = []
-    # Calculate duration per chunk
-    chunk_duration = duration / len(chunks)
 
-    for i, text in enumerate(chunks):
+    word_duration = duration / len(words)
+
+    for i, word in enumerate(words):
+
+        # Highlight current word
         txt = TextClip(
-            text=text.upper(),
-            font_size=110,           # Bigger font for 1-2 words
-            color="white",
+            text=word.upper(),
+            font_size=120,
+            color="yellow",          # highlight color
             stroke_color="black",
-            stroke_width=3,
-            method='caption',        # This is CRITICAL to keep text in bounds
-            size=(900, None),        # Forces text to wrap if it hits 900px wide
-            text_align='center'      # Centers the text inside that 900px box
+            stroke_width=5,
+            method="caption",
+            size=(900, 320),
+            text_align="center"
         )
 
-        # 960 is exact vertical center
-        txt = txt.with_position(("center", 960))
-        txt = txt.with_start(i * chunk_duration)
-        txt = txt.with_duration(chunk_duration)
+        txt = TextClip(
+            text=word.upper(),
+            font_size=120,
+            color="yellow",
+            stroke_color="black",
+            stroke_width=5,
+            method="caption",
+            size=(900, 320),
+            text_align="center"
+        ).with_position(("center",1500)).with_start(i * word_duration).with_duration(word_duration).resized(lambda t: 1 + 0.1 * t)
 
         subtitles.append(txt)
 
     return subtitles
 
 
+# -----------------------------
+# Main Video Generator
+# -----------------------------
 def generate_video(script):
 
+    # load audio
+    audio = AudioFileClip(VOICE_FILE)
+
+    narration_duration = audio.duration
+
+    # enforce minimum short length
+    if narration_duration < 35:
+        print("Narration too short, regenerating...")
+        return None
+
+    # get gameplay videos
     videos = [f for f in os.listdir(GAMEPLAY_FOLDER) if f.endswith(".mp4")]
 
+    if not videos:
+        raise Exception("No gameplay videos found in gameplay folder")
+
     random_video = random.choice(videos)
+
     video_path = os.path.join(GAMEPLAY_FOLDER, random_video)
 
     video = VideoFileClip(video_path)
 
-    audio = AudioFileClip(VOICE_FILE)
-
-    narration_duration = audio.duration
     video_duration = video.duration
 
-    start_time = random.uniform(0, video_duration - narration_duration)
+    # ensure gameplay is longer than narration
+    if video_duration <= narration_duration:
+        start_time = 0
+    else:
+        start_time = random.uniform(0, video_duration - narration_duration)
+
     end_time = start_time + narration_duration
 
     clip = video.subclipped(start_time, end_time)
@@ -81,14 +102,19 @@ def generate_video(script):
         height=1920
     )
 
-    # attach audio AFTER crop
+    # attach narration
     clip = clip.with_audio(audio)
 
-    # now video is final 1080x1920
+    # generate subtitles
     subtitles = generate_subtitles(script, narration_duration)
 
-    final_clip = CompositeVideoClip([clip, *subtitles], size=(1080, 1920))
+    # combine video + subtitles
+    final_clip = CompositeVideoClip(
+        [clip, *subtitles],
+        size=(1080, 1920)
+    )
 
+    # export short
     final_clip.write_videofile(
         OUTPUT_FILE,
         codec="libx264",
@@ -99,3 +125,5 @@ def generate_video(script):
     )
 
     print("Short generated:", OUTPUT_FILE)
+
+    return OUTPUT_FILE

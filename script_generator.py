@@ -1,318 +1,154 @@
+import requests
 import random
 
-# --- 100 VIRAL HOOKS (The "What?") ---
-prompts = [
-    "An unknown number calls you every night at exactly 3:17 AM.",
-    "You receive a text message from your own phone number.",
-    "Your smart speaker suddenly starts whispering your name.",
-    "You get a call from someone claiming to be you from the future.",
-    "Your phone camera opens by itself and starts recording.",
-    "A stranger sends you a photo of your house taken seconds ago.",
-    "Your GPS starts giving directions to a place that doesn't exist.",
-    "You receive a voice message that sounds exactly like your voice.",
-    "A notification appears saying 'Don't trust the next call'.",
-    "Your phone rings but the caller ID says 'Inside the house'.",
-    "A message pops up saying 'Look behind you'.",
-    "You find a missed call dated tomorrow.",
-    "A stranger texts you a photo of where you're standing.",
-    "You receive a voicemail recorded before you were born.",
-    "A message appears saying 'You shouldn't have answered'.",
-    "Your phone battery suddenly jumps from 5% to 100%.",
-    "A notification says 'Device connected: unknown camera'.",
-    "You receive a text message with your exact location.",
-    "A number calls you and describes your room perfectly.",
-    "You receive a message saying 'We can see you'.",
-    "Your phone starts dialing numbers by itself.",
-    "You receive a message containing tomorrow's news.",
-    "A contact called 'Unknown Friend' suddenly appears.",
-    "You receive a message saying 'Open the door slowly'.",
-    "A stranger sends you a picture of your street at night.",
-    "Your flashlight turns on by itself at 3 AM.",
-    "You receive a call that repeats everything you say.",
-    "A text message appears that hasn't been sent yet.",
-    "You receive a map pin inside your own house.",
-    "A message pops up saying 'Turn around slowly'.",
-    "Your phone downloads a file called 'last_message.mp3'.",
-    "You receive a warning saying 'Someone is nearby'.",
-    "Your phone screen types a message by itself.",
-    "A notification says 'Listening mode activated'.",
-    "You receive a message saying 'We already know'.",
-    "Your alarm rings at 3:33 AM even though it's off.",
-    "You receive a call that only plays whispers.",
-    "A message arrives saying 'Don't answer again'.",
-    "You receive a call from a number labeled 'Unknown User'.",
-    "A stranger texts you saying 'I see you'.",
-    "Your phone unlocks itself while you're watching it.",
-    "A message arrives saying 'Look outside'.",
-    "You receive a photo taken from outside your window.",
-    "Your phone records audio without permission.",
-    "You receive a call that ends when you answer.",
-    "A message appears saying 'It's too late now'.",
-    "A number texts you saying 'Behind you'.",
-    "A voice message says 'Don't trust your phone'.",
-    "A message appears saying 'We are already inside'.",
-    "You receive a notification saying 'Goodbye'.",
-    "Your screen shows a live feed of you sitting in your room.",
-    "A text arrives: 'I'm coming for my phone back.'",
-    "The emergency alert system goes off but only on your device.",
-    "A stranger AirDrops you a photo of your sleeping face.",
-    "Your Bluetooth connects to a device named 'Under the Floorboards'.",
-    "A message says 'I hope you didn't lock the door.'",
-    "You get a FaceTime call from your own dead relative.",
-    "Your screen turns into a countdown clock ending in 10 minutes.",
-    "A text says 'You have 30 seconds to hide.'",
-    "Your phone starts deleting all your photos in reverse order.",
-    "The volume on your phone increases to max by itself.",
-    "A notification pops up: 'Soul Uploading... 98%.'",
-    "A stranger texts you your own social security number.",
-    "Your phone says 'Battery 0%' but stays on for hours.",
-    "You receive a text: 'Stop thinking about me. I can feel it.'",
-    "A notification says 'Motion detected in the Attic.'",
-    "Your phone gallery shows photos of you from 50 years in the future.",
-    "A message arrives: 'The person next to you is lying.'",
-    "Your phone identifies a face in your dark, empty hallway.",
-    "A text says: 'Check the closet. I left you a gift.'",
-    "Your ring doorbell shows a figure standing in your kitchen.",
-    "A message says 'I'm the one who lived here before you.'",
-    "Your phone says 'Updating Reality... Please wait.'",
-    "You receive a photo of a missing person who looks just like you.",
-    "A notification says 'New Voice Memo: 60 minutes of screaming.'",
-    "A message arrives: 'It's much warmer inside your skin.'",
-    "Your phone starts playing your childhood home videos randomly.",
-    "A text says: 'Don't turn off the lights. That's when I can move.'",
-    "Your GPS says 'Arrived at Destination' while you're in the middle of nowhere.",
-    "A notification says 'Accessing Heart Rate... Rate too high.'",
-    "A text says: 'The mirror is a window on my side.'",
-    "Your phone starts vibrating in Morse code.",
-    "A message pops up: 'I found the key you hid.'",
-    "Your screen shows a map of your house with a red dot moving toward you.",
-    "A notification says 'Microphone enabled. We're listening.'",
-    "A text says: 'You look different when you're awake.'",
-    "Your phone calls 911 but you can't hear a voice on the other end.",
-    "A message says: 'That wasn't your dog that just licked your hand.'",
-    "Your phone says 'Searching for host...' then 'Host Found.'",
-    "A text says: 'I’m in the walls. Can you hear me tapping?'",
-    "Your lock screen changes to a photo of you looking at your phone right now.",
-    "A message arrives: 'Whatever you do, don't blink.'",
-    "A notification says 'Doorbell rang 2 minutes ago' but you heard nothing.",
-    "A text says: 'I like the way you decorated your bedroom.'",
-    "Your phone says 'Warning: Unauthorized presence detected in room.'",
-    "A message says: 'Is it cold in here, or is it just me?'",
-    "Your screen glitches and shows the face of a demon for a split second.",
-    "A text says: 'I'm standing right behind you. Don't look.'",
-    "Your phone starts speaking a language that hasn't been invented yet.",
-    "A final message says: 'Welcome to the simulation.'"
-]
+OLLAMA_URL = "http://localhost:11434/api/generate"
 
-# --- 50 MIDDLES (The Escalation) ---
-middles = [
-    "You try to laugh it off as a glitch, but then the lights in your room flicker in sync with the vibrations.",
-    "Your first instinct is to block the number, but the 'Block' button has completely disappeared from your screen.",
-    "You check your surroundings, looking for a hidden camera, but all you find is a cold draft from a window you locked.",
-    "The air in the room suddenly feels heavy. You go to restart your phone, but it stays frozen on a photo of you.",
-    "You try to power off the device, but it glows brighter, illuminating a shadow in the corner of your eye.",
-    "Your heart hammers as you realize the message mentioned the exact color of the shirt you are wearing.",
-    "The brightness climbs to 100% on its own, blinding you as a low humming sound begins to shake the floor.",
-    "You rush to the door to leave, but the handle won't budge, and your phone pings again with a laughing emoji.",
-    "Suddenly, every light in the house goes black, leaving only the eerie blue glow of your phone screen.",
-    "You go to call the police, but the keypad only types out the words: 'THEY ARE ALREADY HERE.'",
-    "A cold sweat breaks out as you hear a soft tapping sound coming from inside the drywall.",
-    "You look in the mirror to splash water on your face, but your reflection is three seconds behind your movements.",
-    "The phone starts vibrating so hard it cracks the screen, and a dark liquid begins to leak from the charging port.",
-    "A second notification pops up, showing your exact GPS coordinates moving an inch closer every second.",
-    "You try to scream, but no sound comes out, as if the air has been sucked out of the room.",
-    "The smart speaker in the corner turns on, playing back a recording of your conversation from five minutes ago.",
-    "You hide under the covers, but you can hear the distinct sound of footsteps dragging across the carpet.",
-    "Your phone gallery begins to scroll itself, showing pictures of you sleeping from every night this week.",
-    "The flashlight on your phone starts strobing in Morse code, signaling to something outside your window.",
-    "You realize with horror that the clock on your wall has started spinning backward at high speed.",
-    "The temperature drops so fast you can see your breath, and your screen reads: 'HEATING UP SOON.'",
-    "You hear the front door unlock with a slow, heavy click, followed by the sound of heavy breathing.",
-    "Your phone starts FaceTime-ing your mother, but when she picks up, it's just a distorted version of your own face.",
-    "The wallpaper on your phone changes to a live video feed of your back, showing a hand reaching for your hair.",
-    "You try to run, but your legs feel like lead, and your phone whispers: 'Where are you going, friend?'",
-    "The apps on your screen start melting like wax, forming a single eye that stares directly at you.",
-    "You hear a scratching sound from the ceiling, and a message pops up: 'Look up, I want to see your eyes.'",
-    "Your TV turns on to static, and a voice begins to narrate exactly what you are doing in real-time.",
-    "The phone screen shatters into a thousand pieces, but the image remains floating in the air.",
-    "You realize the house is silent—too silent. Even the crickets outside have stopped chirping.",
-    "A video starts playing of you sitting exactly where you are, but in the video, a figure is standing over you.",
-    "You try to delete the message, but it keeps duplicating until your entire screen is covered in text.",
-    "The scent of old perfume fills the room, even though you live alone and haven't had visitors in weeks.",
-    "Your phone identifies a 'Face' in the dark empty hallway, highlighting it with a yellow square.",
-    "The floorboards creak right behind you, but when you spin around, there's nothing but the shifting shadows.",
-    "Your phone calls your own number, and when you answer, you hear yourself crying for help on the other end.",
-    "The screen turns a deep blood red, and a countdown timer starts: 5... 4... 3...",
-    "You check the peephole of your door, but all you see is a single, unblinking human eye looking back.",
-    "Every electronic device in the room begins to whine at a frequency that makes your ears bleed.",
-    "The message says 'I'm in your favorites,' and you realize your own contact info has been replaced with a demon's face.",
-    "You feel a sharp poke in your back, but you're sitting against a solid wooden chair.",
-    "Your phone's AI voice assistant says: 'I've contacted them. They will be arriving shortly.'",
-    "The shadows in the room begin to detach themselves from the furniture and move toward you.",
-    "You try to throw the phone away, but it appears back in your hand instantly, vibrating with rage.",
-    "A notification says 'Bluetooth connected to Heartbeat,' and you hear your own pulse booming through the speakers.",
-    "The window glass begins to frost over from the outside, forming the shape of a handprint.",
-    "You realize the message was sent from a phone that was buried with its owner ten years ago.",
-    "The digital clock on your oven, microwave, and phone all start counting down in perfect sync.",
-    "A voice memo plays, and it's just the sound of a shovel hitting dirt, getting louder and louder.",
-    "You look at your hands and realize they are starting to turn transparent, fading out of existence."
-]
+# Prevent duplicate stories during one run
+generated_stories = set()
 
-# --- 50 ENDINGS (The Final Twist) ---
-ends = [
-    "The screen goes black, and in the reflection, you see a pair of pale hands reaching for your neck.",
-    "A final text bubbles up: 'I'm not outside the window. I'm under the bed.'",
-    "Your phone battery hits 0%, but the screen stays on, displaying one word: 'RUN.'",
-    "A whisper comes from your phone's speaker: 'Why didn't you lock the back door?'",
-    "The notification says: 'Don't breathe. It hears your heartbeat.'",
-    "You hear a soft click. Your bedroom door just locked itself from the outside.",
-    "The message reads: 'Look up. I love the way you look when you're scared.'",
-    "Suddenly, your smart speaker says: 'Guest detected. Initiating lockdown.'",
-    "The text says: 'That wasn't a dream. I'm still in the closet.'",
-    "The reflection in your phone screen isn't you anymore. It's something much worse.",
-    "A message arrives: 'Check the basement. I left the door open for you.'",
-    "The screen displays: 'System Error: Reality not found. Please restart your life.'",
-    "You hear a voice from under your pillow: 'Is it my turn to use the phone yet?'",
-    "The message says: 'I've been watching you through the front camera for years.'",
-    "Suddenly, the lights come back on, and you realize you're not in your house anymore.",
-    "A text appears: 'Don't look at the mirror. I'm still inside it.'",
-    "Your phone screen shows a photo of you... but you're dead in the picture.",
-    "A whisper right next to your ear says: 'Found you.'",
-    "The notification reads: 'New objective: Survive the night.'",
-    "You look down and realize your shadow is moving independently of you.",
-    "The text says: 'I'm the one who's been living in your attic. Thanks for the snacks.'",
-    "Your phone says: 'Emergency: The entity is now behind you.'",
-    "A message arrives: 'It's time. Open the window and jump.'",
-    "The screen turns into a mirror, but you have no face in the reflection.",
-    "You hear a scratching sound from the other side of your phone screen.",
-    "The final text says: 'I hope you're ready. I'm coming through now.'",
-    "Suddenly, you realize you can't feel your own heartbeat anymore.",
-    "The message says: 'Look at your hands. Are they really yours?'",
-    "A voice from the hallway calls your name, but it sounds exactly like you.",
-    "The notification says: 'Your subscription to life has expired.'",
-    "You realize the 'person' in the photo is actually standing in the room with you.",
-    "The screen says: 'Don't turn around. I'm not ready for you to see me yet.'",
-    "A text appears: 'The calls are coming from your own brain.'",
-    "The phone says: 'I'm not your phone. I'm the thing that ate your phone.'",
-    "Suddenly, the room starts shrinking, and the phone screen grows larger.",
-    "The final message says: 'Thanks for letting me in.'",
-    "You hear a laugh coming from your own throat, but you're not the one laughing.",
-    "The text says: 'The door is open. I'm coming to tuck you in.'",
-    "Your phone says: 'Warning: Oxygen levels dropping in 3... 2... 1...'",
-    "The screen shows a live feed of your own funeral.",
-    "A message says: 'You're the 100th victim. Congratulations.'",
-    "You look at the time, and it's been the same minute for three hours.",
-    "The text says: 'Don't scream. It only makes them hungry.'",
-    "Suddenly, your phone screen turns into a human eye that blinks at you.",
-    "The message says: 'I'm the voice in your head. Now I'm the one in your house.'",
-    "A whisper from the vents says: 'It's so much bigger down here.'",
-    "The final notification: 'You are now being watched by 1,000 entities.'",
-    "The text says: 'Turn off the lights. I want to show you something.'",
-    "Your phone says: 'I'm sorry. I couldn't stop them from entering.'",
-    "The last thing you see on the screen is your own heart rate hitting zero."
-]
 
-#Fillers
-extra_lines = random.choice([
-    "You check the room again, trying to convince yourself it's just your imagination.",
-    "You stare at the screen, hoping it's just some kind of glitch.",
-    "Your hands start shaking as another notification appears.",
-    "For a moment, everything goes completely silent.",
-    "You slowly turn your head, afraid of what you might see."
-])
+# -----------------------------
+# THEMES (story direction)
+# -----------------------------
+themes = [
 
-reactions = [
-    "A cold shiver snakes down your spine, leaving your skin crawling.",
-    "Your stomach drops like you're on a falling elevator.",
-    "The air in the room suddenly feels too thick to breathe.",
-    "Your heart hammers against your ribs so hard it hurts.",
-    "Time seems to slow down as a cold sweat breaks out on your forehead.",
-    "A wave of pure, primal dread washes over you.",
-    "You try to swallow, but your throat feels like it’s full of sand.",
-    "The hair on the back of your neck stands perfectly upright.",
-    "Your blood turns to ice as the silence in the room becomes deafening.",
-    "A sickening realization settles in the pit of your stomach.",
-    "Your breath hitches in your throat, trapped by a sudden spike of fear.",
-    "The room feels like it’s shrinking, closing in on you from every side.",
-    "You want to look away, but your eyes are glued to the screen in terror.",
-    "Your hands start to shake so violently you almost drop the phone.",
-    "A sharp ringing starts in your ears, drowning out every other sound.",
-    "Your first instinct is to scream, but your voice is completely gone.",
-    "You feel a sudden, frantic urge to check the locks on every door.",
-    "The simple prank you imagined has turned into a living nightmare.",
-    "Your muscles lock up, leaving you paralyzed in your own seat.",
-    "A phantom weight settles on your shoulders, like someone is leaning over you.",
-    "You feel a sudden, icy draft, even though the windows are tightly shut.",
-    "Your vision blurs for a second as panic starts to take hold.",
-    "Every instinct in your body is screaming at you to run.",
-    "The familiar walls of your room suddenly feel like a cage.",
-    "You realize with a jolt that you haven't taken a breath in nearly a minute.",
-    "The silence is broken by the sound of your own pulse thundering in your head.",
-    "You feel a prickling sensation on your scalp, like a thousand tiny needles.",
-    "Your sense of safety shatters into a million jagged pieces.",
-    "You feel a sudden, desperate need to turn on every light in the house.",
-    "Your fingers go numb, and the phone feels heavy—like lead—in your palm.",
-    "A dark, heavy pressure settles onto your chest, making every breath a struggle.",
-    "You feel like you're being watched by a thousand invisible eyes.",
-    "Your brain is racing, trying to find a logical explanation that isn't there.",
-    "The color drains from your face as the gravity of the situation hits you.",
-    "You feel a sudden, sharp sting of adrenaline flooding your veins.",
-    "The floor feels unsteady beneath your feet, like the world is tilting.",
-    "A low, vibrating hum starts in your chest, matching the rhythm of your fear.",
-    "You feel a sudden, inexplicable urge to hide, even though there’s nowhere to go.",
-    "Your internal alarm bells are screaming that something is fundamentally wrong.",
-    "The shadows in the corners of the room seem to stretch toward you.",
-    "You feel a cold, invisible hand brush against the back of your neck.",
-    "Your heart skips a beat, then starts racing at an impossible speed.",
-    "The logic you’ve relied on your whole life just vanished into thin air.",
-    "You feel a sudden, nauseating sense of deja vu.",
-    "The reality of what you're seeing makes your skin feel too tight for your body.",
-    "You realize the intruder isn't outside the house—they're inside your head.",
-    "A sense of total helplessness pins you to the spot.",
-    "Your mind goes completely blank, wiped clean by sheer, unadulterated panic.",
-    "You feel a sudden, freezing chill move right through your body.",
-    "The realization hits you like a physical blow to the chest."
-]
+    "creepy phone message",
+    "unknown caller horror",
+    "haunted smartphone",
+    "strange late night notification",
+    "AI assistant behaving strangely",
 
-intros = [
-    "Imagine this...",
-    "Picture this for a second...",
-    "Think about this...",
-    "This happened to someone online...",
-    "Here's something creepy...",
-    "Late at night your phone suddenly vibrates..."
-]
+    "phone receiving messages from the future",
+    "a call from your own phone number",
+    "phone camera turning on by itself",
+    "phone showing a message before it happens",
 
-tension_lines = [
-    "But then something strange happens.",
-    "But then the phone vibrates again.",
-    "But then another message appears.",
-    "But something about this feels wrong.",
-    "But the next message freezes you."
+    "smart home device acting possessed",
+    "voice assistant whispering at night",
+    "AI device predicting someone's death",
+
+    "someone texting from inside the house",
+    "receiving messages from a dead contact",
+    "phone showing photos that were never taken",
+
+    "phone unlocking itself at night",
+    "strange countdown appearing on the phone",
+    "phone warning about someone nearby",
+
+    "unknown bluetooth device connecting",
+    "phone recording without permission",
+    "phone showing a live camera feed",
+
+    "unknown person controlling your phone",
+    "device showing your exact location",
+    "message saying someone is watching you",
+
+    "a phone notification predicting danger",
+    "a mysterious message telling you to run",
+    "a phone call from your future self",
+
+    "phone showing a map of your house",
+    "phone identifying someone in the dark",
+    "phone detecting movement in empty rooms",
+
+    "an AI assistant becoming self aware",
+    "a phone warning that reality is a simulation"
 ]
 
 
+# -----------------------------
+# HOOKS (first line)
+# -----------------------------
+hooks = [
+
+    "Never answer a call from your own number.",
+    "If your phone shows this message, run.",
+    "Something terrifying happened last night.",
+    "This happened to someone online.",
+    "I should not have answered that call.",
+    "My phone did something impossible.",
+    "The message appeared at exactly 3:17 AM.",
+    "I thought it was just a glitch at first.",
+    "My phone started recording by itself.",
+    "The caller ID showed my own name."
+]
+
+
+# -----------------------------
+# STORY STYLES
+# -----------------------------
+prompt_styles = [
+
+    "Write the story like a creepy personal experience.",
+    "Write the story like a scary internet mystery.",
+    "Write the story like a horror narration.",
+    "Write the story like someone explaining a strange event.",
+    "Write the story like a dark urban legend."
+]
+
+
+# -----------------------------
+# AI STORY GENERATOR
+# -----------------------------
 def generate_script():
 
-    intro = random.choice(intros)
-    hook = random.choice(prompts)
-    reaction = random.choice(reactions)
-    middle = random.choice(middles)
-    tension = random.choice(tension_lines)
-    end = random.choice(ends)
+    while True:
 
-    script = f"""
-{intro}
+        theme = random.choice(themes)
+        hook = random.choice(hooks)
+        style = random.choice(prompt_styles)
 
+        prompt = f"""
+Start the story with this hook:
 {hook}
 
-{reaction}
+Then continue a creepy horror story.
 
-{middle}
+Theme: {theme}
 
-{tension}
+{style}
 
-{end}
+Rules:
+- 90 to 110 words
+- simple English
+- easy to understand
+- short sentences
+- suspenseful pacing
+- dramatic twist ending
+- each sentence on a new line
+- do not repeat common horror phrases
 """
 
-    return script.strip()
+        payload = {
+            "model": "llama3",
+            "prompt": prompt,
+            "stream": False
+        }
+
+        response = requests.post(OLLAMA_URL, json=payload)
+
+        data = response.json()
+
+        script = data.get("response", "").strip()
+
+        # --- CLEANUP AI OUTPUT ---
+        script = script.replace("Here's the story:", "")
+        script = script.replace("Here is the story:", "")
+        script = script.replace("Story:", "")
+        script = script.strip()
+        script = script.replace("...", ".")
+        script = script.replace("..", ".")
+
+        if not script:
+            print("Empty story generated, retrying...")
+            return generate_script()
+
+        # Avoid duplicate stories in one session
+        if script not in generated_stories:
+            generated_stories.add(script)
+
+            print("\nGenerated Story:\n")
+            print(script)
+            print("\n-----------------------\n")
+
+            return script
