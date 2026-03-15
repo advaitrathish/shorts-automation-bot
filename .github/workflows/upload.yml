@@ -29,4 +29,7 @@ jobs:
           pip install schedule
 
       - name: Run bot
-        run: python main.py
+        working-directory: .
+        run: |
+          ls -R
+          python main.py
