@@ -1,7 +1,7 @@
 AI Shorts Generator
 
 Features
-- AI generated horror stories (Ollama)
+- AI generated horror stories (Grok)
 - Neural voice narration
 - Minecraft gameplay background
 - Viral subtitle animation
@@ -12,4 +12,3 @@ Tech Stack
 Python
 MoviePy
 Edge-TTS
-Ollama (Llama3)
