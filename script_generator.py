@@ -123,22 +123,18 @@ Rules:
 """
 
         headers = {
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
+    "Authorization": f"Bearer {GROQ_API_KEY}",
+    "Content-Type": "application/json"
         }
 
         payload = {
             "model": "llama3-70b-8192",
             "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
+                {"role": "user", "content": prompt}
             ]
         }
 
         response = requests.post(GROQ_URL, headers=headers, json=payload)
-
         data = response.json()
 
         script = data["choices"][0]["message"]["content"].strip()
