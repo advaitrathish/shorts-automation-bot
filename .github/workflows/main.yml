@@ -37,3 +37,5 @@ jobs:
         run: |
           echo "Starting AI Shorts Bot..."
           python main.py
+
+# force workflow refresh
